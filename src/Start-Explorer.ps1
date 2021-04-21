@@ -41,7 +41,8 @@ Function FolderAction {
         ForEach ($folder in $Folders) {
             $arrayVal = $folders.indexof($folder)
         }
-        FolderAction2 #Function  
+
+            FolderAction2 #Function  
     }
 }
 Function ChildFolder {
@@ -99,31 +100,51 @@ Function start-UCExplorer {
         $UserOption = $Folders[$userInput]                 
         if ((Get-Item -path $HomePathSet\$userOption) -is [System.IO.DirectoryInfo]) {
             Clear-Host
-            $UserOption = $folders[$userInput]
-            Push-Location .\$userOption
-            $Message = Get-Location
-            Write-Host "You Are Currently Working $Message Directory"
-            #Getting the content of the childItem
-            ChildFolder #function 1
-            ChildFolder #function 2
-            ChildFolder #function 3
-            ChildFolder #function 4
-            ChildFolder #function 5
-            ChildFolder #function 6
-            ChildFolder #function 7
-            ChildFolder #function 8
-            ChildFolder #function 9
-            ChildFolder #function 10
-            ChildFolder #function 11
-            ChildFolder #function 12
-            ChildFolder #function 13
-            ChildFolder #function 14
-            ChildFolder #function 15
-            ChildFolder #function 16
-            ChildFolder #function 17
-            ChildFolder #function 18
-            ChildFolder #function 19
-            ChildFolder #function 20
+            Try{
+                $UserOption = $folders[$userInput]
+                Push-Location .\$userOption
+                $Message = Get-Location
+                Write-Host "You Are Currently Working $Message Directory"
+
+                #checking if the directory is empty or not, then send a message to user
+                if((Get-ChildItem) -eq $Null){
+                    Write-Host "Sorry, This Directory is empty"
+                    Pop-Location
+                    Write-Host "Redirecting..."
+                    Start-Sleep -Seconds 5
+                    FolderAction #Function
+                } Else {
+                        #Getting the content of the childItem
+                        ChildFolder #function 1
+                        ChildFolder #function 2
+                        ChildFolder #function 3
+                        ChildFolder #function 4
+                        ChildFolder #function 5
+                        ChildFolder #function 6
+                        ChildFolder #function 7
+                        ChildFolder #function 8
+                        ChildFolder #function 9
+                        ChildFolder #function 10
+                        ChildFolder #function 11
+                        ChildFolder #function 12
+                ChildFolder #function 13
+                ChildFolder #function 14
+                ChildFolder #function 15
+                ChildFolder #function 16
+                ChildFolder #function 17
+                ChildFolder #function 18
+                ChildFolder #function 19
+                ChildFolder #function 20 
+                }
+                 
+                }
+                Catch [System.ComponentModel.Win32Exception] {
+                    $Error[0].exception
+                }
+                Catch [System.Management.Automation.RuntimeException] {
+                    $Error[0].exception
+                }
+            
         }
         Else {
             Invoke-Item -Path .\$UserOption
