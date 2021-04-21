@@ -45,6 +45,7 @@ Function FolderAction {
     }
 }
 Function ChildFolder {
+Clear-Host
     #Set the current path to user choice
     #Checking for the existence of a Directory in the current Location
     if (((Get-ChildItem -Path .\ -Directory).Count) -ne 0) {
@@ -82,7 +83,7 @@ Function start-UCExplorer {
     param()
     Begin {
         Clear-Host
-        $UserPath = Split-Path $env:HOMEPATH -Leaf #Split user path to get the username
+        $UserPath = Split-Path $env:HOMESHARE -Leaf #Split user path to get the username
         $HomePathSet = "C:\users\$UserPath" #Set the directory to loop contents on
         Set-Location $HomePathSet #set Path to user home path
     }
