@@ -41,28 +41,41 @@ Function FolderAction {
         ForEach ($folder in $Folders) {
             $arrayVal = $folders.indexof($folder)
         }
-        FolderAction2 #Function  
+
+            FolderAction2 #Function  
     }
 }
 Function ChildFolder {
     #Set the current path to user choice
     #Checking for the existence of a Directory in the current Location
     if (((Get-ChildItem -Path .\ -Directory).Count) -ne 0) {
-        $ChildDir = Get-ChildItem -Path .\ -Directory
+        <#$ChildDir = Get-ChildItem -Path .\ -Directory
         ForEach ($dir in $ChildDir) {
             #$subDirectoryCount = (Get-ChildItem $dir -Directory).Count
-        }
+        }#>
+        #**********************************************************
+        $filePath = [System.Collections.ArrayList] @()
+                $GetDirContent = Get-ChildItem .\
+                ForEach($File in $GetDirContent){
+                    $Null = $filePath.Add($file)
+                    }
+        #**************************************************************
+
         FolderAction #function
         "`n"
-        $userInput = Read-Host "SELECT AN UPTION ABOVE TO OPEN A FILE/FOLDER"
+        $userInput = Read-Host "SELECT AN UPTION ABOVE TO OPEN A FILE/FOLDER(BACK (00))"
         $ChildUserOption = $ChildDir[$userInput]
-        if (($ChildDir[$userInput]) -is [System.IO.DirectoryInfo]) {
+        $dir_file_path = Get-ChildItem -Path . -Name $filePath[$userInput]
+        Write-Host "******************"
+        $dir_file_path
+        Write-Host "******************"
+        if (($FilePath[$userInput]) -is [System.IO.DirectoryInfo]) {
             $userPath = $ChildDir[$userInput]
             Push-Location $userPath
             $Message = Get-Location
             Write-Host "You Are Currently Working $Message Directory"
         }
-        Else {
+        Elseif(($FilePath[$userInput]) -is [System.IO.FileInfo]) {
                 $filePath = [System.Collections.ArrayList] @()
                 $GetDirContent = Get-ChildItem .\
                 ForEach($File in $GetDirContent){
@@ -72,10 +85,13 @@ Function ChildFolder {
                 $filePath2 = $filePath[$userInput]
                 Invoke-Item -Path .\$filePath2
             
-        }
+        } Else {Write-Host "You just selected the wrong"}
            
     }
     Else {}
+
+    
+
 }
 Function start-UCExplorer {
     [cmdletbinding()]
@@ -103,19 +119,28 @@ Function start-UCExplorer {
                 Push-Location .\$userOption
                 $Message = Get-Location
                 Write-Host "You Are Currently Working $Message Directory"
-                #Getting the content of the childItem
-                ChildFolder #function 1
-                ChildFolder #function 2
-                ChildFolder #function 3
-                ChildFolder #function 4
-                ChildFolder #function 5
-                ChildFolder #function 6
-                ChildFolder #function 7
-                ChildFolder #function 8
-                ChildFolder #function 9
-                ChildFolder #function 10
-                ChildFolder #function 11
-                ChildFolder #function 12
+
+                #checking if the directory is empty or not, then send a message to user
+                if((Get-ChildItem) -eq $Null){
+                    Write-Host "Sorry, This Directory is empty"
+                    Pop-Location
+                    Write-Host "Redirecting..."
+                    Start-Sleep -Seconds 5
+                    start-UCExplorer
+                } Else {
+                        #Getting the content of the childItem
+                        ChildFolder #function 1
+                        ChildFolder #function 2
+                        ChildFolder #function 3
+                        ChildFolder #function 4
+                        ChildFolder #function 5
+                        ChildFolder #function 6
+                        ChildFolder #function 7
+                        ChildFolder #function 8
+                        ChildFolder #function 9
+                        ChildFolder #function 10
+                        ChildFolder #function 11
+                        ChildFolder #function 12
                 ChildFolder #function 13
                 ChildFolder #function 14
                 ChildFolder #function 15
@@ -123,7 +148,9 @@ Function start-UCExplorer {
                 ChildFolder #function 17
                 ChildFolder #function 18
                 ChildFolder #function 19
-                ChildFolder #function 20  
+                ChildFolder #function 20 
+                }
+                 
                 }
                 Catch [System.ComponentModel.Win32Exception] {
                     $Error[0].exception
