@@ -50,21 +50,33 @@ Clear-Host
     #Set the current path to user choice
     #Checking for the existence of a Directory in the current Location
     if (((Get-ChildItem -Path .\ -Directory).Count) -ne 0) {
-        $ChildDir = Get-ChildItem -Path .\ -Directory
+        <#$ChildDir = Get-ChildItem -Path .\ -Directory
         ForEach ($dir in $ChildDir) {
             #$subDirectoryCount = (Get-ChildItem $dir -Directory).Count
-        }
+        }#>
+        #**********************************************************
+        $filePath = [System.Collections.ArrayList] @()
+                $GetDirContent = Get-ChildItem .\
+                ForEach($File in $GetDirContent){
+                    $Null = $filePath.Add($file)
+                    }
+        #**************************************************************
+
         FolderAction #function
         "`n"
-        $userInput = Read-Host "SELECT AN UPTION ABOVE TO OPEN A FILE/FOLDER"
+        $userInput = Read-Host "SELECT AN UPTION ABOVE TO OPEN A FILE/FOLDER(BACK (00))"
         $ChildUserOption = $ChildDir[$userInput]
-        if (($ChildDir[$userInput]) -is [System.IO.DirectoryInfo]) {
+        $dir_file_path = Get-ChildItem -Path . -Name $filePath[$userInput]
+        Write-Host "******************"
+        $dir_file_path
+        Write-Host "******************"
+        if (($FilePath[$userInput]) -is [System.IO.DirectoryInfo]) {
             $userPath = $ChildDir[$userInput]
             Push-Location $userPath
             $Message = Get-Location
             Write-Host "You Are Currently Working $Message Directory"
         }
-        Else {
+        Elseif(($FilePath[$userInput]) -is [System.IO.FileInfo]) {
                 $filePath = [System.Collections.ArrayList] @()
                 $GetDirContent = Get-ChildItem .\
                 ForEach($File in $GetDirContent){
@@ -74,10 +86,13 @@ Clear-Host
                 $filePath2 = $filePath[$userInput]
                 Invoke-Item -Path .\$filePath2
             
-        }
+        } Else {Write-Host "You just selected the wrong"}
            
     }
     Else {}
+
+    
+
 }
 Function start-UCExplorer {
     [cmdletbinding()]
@@ -112,7 +127,7 @@ Function start-UCExplorer {
                     Pop-Location
                     Write-Host "Redirecting..."
                     Start-Sleep -Seconds 5
-                    FolderAction #Function
+                    start-UCExplorer
                 } Else {
                         #Getting the content of the childItem
                         ChildFolder #function 1
