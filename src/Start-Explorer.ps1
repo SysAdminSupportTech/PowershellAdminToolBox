@@ -1,28 +1,4 @@
-﻿
-
-#Windows Explorer Simulator
-Function FolderAction2 {
-    [cmdletbinding()]
-    param()
-    Begin {}
-    Process {
-        $dirContents = Get-ChildItem -Path .\
-        $dirCount = (Get-ChildItem -Path .\ -Directory).count
-        Write-Host "SELECT FROM THE NUMBER BELOW TO OPEN A FOLDER\fILES" -ForegroundColor Green
-        ForEach ($dir in $dirContents) {
-            $arrayVal = $dirContents.IndexOf($dir)
-            if (($dir) -is [System.IO.DirectoryInfo]) {
-                Write-Host "$arrayVal) $dir Directory"
-            }
-            Else {
-                Write-Host "$arrayVal) $dir File"
-            }
-
-        }
-    }
-    End {}
-}
-#**************************************** Action Functions *************************************#
+﻿#Windows Explorer Simulator
 Function ActionPrompt { 
   
     Write-Host "(1) Open (2) Copy (3) Move (4) Delete (5) Rename (6) Check Properties (7) Create New Folder (8) Copy-Path (0) Back"
@@ -33,25 +9,27 @@ Function FolderAction {
     Begin {}
     Process {
         $Folders = [System.Collections.ArrayList]@()
-        Get-ChildItem .\ | ForEach-Object {
-            $null = $folders.Add("$_") #adding folders name to the empty array bucket
-        }
-        #$dirContents = Get-ChildItem -Path .\
-        $dirCount = (Get-ChildItem -Path .\ -Directory).count
-        ForEach ($folder in $Folders) {
-            $arrayVal = $folders.indexof($folder)
-        }
+        Write-Host "SELECT FROM THE NUMBER BELOW TO OPEN A FOLDER\fILES" -ForegroundColor Green
+        $File_folders = Get-ChildItem .\
+        ForEach($file_folder in $File_folders) {
+            $ArrayIndex = $Folders.Add($file_folder)
 
-            FolderAction2 #Function  
+            if(($file_folder) -is [System.IO.DirectoryInfo]){
+                Write-Host "$arrayIndex) $file_folder Directory"
+            }
+            Else{Write-Host "$arrayIndex) $file_folder File"}
+        }
+         
     }
 }
 Function ChildFolder {
     #Set the current path to user choice
     #Checking for the existence of a Directory in the current Location
     if (((Get-ChildItem -Path .\ -Directory).Count) -ne 0) {
-        $ChildDir = Get-ChildItem -Path .\ -Directory
+        $ChildDir = Get-ChildItem -Path .\ -Directory -Force
         ForEach ($dir in $ChildDir) {
             #$subDirectoryCount = (Get-ChildItem $dir -Directory).Count
+  
         }
         FolderAction #function
         "`n"
@@ -98,14 +76,14 @@ Function start-UCExplorer {
         #Checking if value seleted is a file or folder
         $UserOption = $Folders[$userInput]                 
         if ((Get-Item -path $HomePathSet\$userOption) -is [System.IO.DirectoryInfo]) {
-            Clear-Host
             Try{
                 $UserOption = $folders[$userInput]
                 Push-Location .\$userOption
                 $Message = Get-Location
-                Write-Host "You Are Currently Working $Message Directory"
+                Write-Host "You Are Currently Working $Message Directory)"
 
                 #checking if the directory is empty or not, then send a message to user
+                #Error Message Gotten from here.
                 if((Get-ChildItem) -eq $Null){
                     Write-Host "Sorry, This Directory is empty"
                     Pop-Location
@@ -126,14 +104,14 @@ Function start-UCExplorer {
                         ChildFolder #function 10
                         ChildFolder #function 11
                         ChildFolder #function 12
-                ChildFolder #function 13
-                ChildFolder #function 14
-                ChildFolder #function 15
-                ChildFolder #function 16
-                ChildFolder #function 17
-                ChildFolder #function 18
-                ChildFolder #function 19
-                ChildFolder #function 20 
+                        ChildFolder #function 13
+                        ChildFolder #function 14
+                        ChildFolder #function 15
+                        ChildFolder #function 16
+                        ChildFolder #function 17
+                        ChildFolder #function 18
+                        ChildFolder #function 19
+                        ChildFolder #function 20 
                 }
                  
                 }
