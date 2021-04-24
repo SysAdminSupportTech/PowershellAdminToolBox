@@ -23,6 +23,7 @@ Function FolderAction {
     }
 }
 Function ChildFolder {
+    Clear-Host
     #Set the current path to user choice
     #Checking for the existence of a Directory in the current Location
     if (((Get-ChildItem -Path .\ -Directory).Count) -ne 0) {
@@ -36,10 +37,19 @@ Function ChildFolder {
         $userInput = Read-Host "SELECT AN UPTION ABOVE TO OPEN A FILE/FOLDER"
         $ChildUserOption = $ChildDir[$userInput]
         if (($ChildDir[$userInput]) -is [System.IO.DirectoryInfo]) {
+            #Checking if a Directory is empty or not
+            if((Get-ChildItem) -eq $Null){
+                    Write-Host "Sorry, This Directory is empty"
+                    Pop-Location
+                    Write-Host "Redirecting..."
+                    Start-Sleep -Seconds 5
+                    start-UCExplorer
+              }Else{
             $userPath = $ChildDir[$userInput]
             Push-Location $userPath
             $Message = Get-Location
             Write-Host "You Are Currently Working $Message Directory"
+            }
         }
         Else {
                 $filePath = [System.Collections.ArrayList] @()
