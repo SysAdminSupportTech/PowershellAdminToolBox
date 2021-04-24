@@ -46,37 +46,24 @@ Function FolderAction {
     }
 }
 Function ChildFolder {
-Clear-Host
     #Set the current path to user choice
     #Checking for the existence of a Directory in the current Location
     if (((Get-ChildItem -Path .\ -Directory).Count) -ne 0) {
-        <#$ChildDir = Get-ChildItem -Path .\ -Directory
+        $ChildDir = Get-ChildItem -Path .\ -Directory
         ForEach ($dir in $ChildDir) {
             #$subDirectoryCount = (Get-ChildItem $dir -Directory).Count
-        }#>
-        #**********************************************************
-        $filePath = [System.Collections.ArrayList] @()
-                $GetDirContent = Get-ChildItem .\
-                ForEach($File in $GetDirContent){
-                    $Null = $filePath.Add($file)
-                    }
-        #**************************************************************
-
+        }
         FolderAction #function
         "`n"
-        $userInput = Read-Host "SELECT AN UPTION ABOVE TO OPEN A FILE/FOLDER(BACK (00))"
+        $userInput = Read-Host "SELECT AN UPTION ABOVE TO OPEN A FILE/FOLDER"
         $ChildUserOption = $ChildDir[$userInput]
-        $dir_file_path = Get-ChildItem -Path . -Name $filePath[$userInput]
-        Write-Host "******************"
-        $dir_file_path
-        Write-Host "******************"
-        if (($FilePath[$userInput]) -is [System.IO.DirectoryInfo]) {
+        if (($ChildDir[$userInput]) -is [System.IO.DirectoryInfo]) {
             $userPath = $ChildDir[$userInput]
             Push-Location $userPath
             $Message = Get-Location
             Write-Host "You Are Currently Working $Message Directory"
         }
-        Elseif(($FilePath[$userInput]) -is [System.IO.FileInfo]) {
+        Else {
                 $filePath = [System.Collections.ArrayList] @()
                 $GetDirContent = Get-ChildItem .\
                 ForEach($File in $GetDirContent){
@@ -86,20 +73,17 @@ Clear-Host
                 $filePath2 = $filePath[$userInput]
                 Invoke-Item -Path .\$filePath2
             
-        } Else {Write-Host "You just selected the wrong"}
+        }
            
     }
     Else {}
-
-    
-
 }
 Function start-UCExplorer {
     [cmdletbinding()]
     param()
     Begin {
         Clear-Host
-        $UserPath = Split-Path $env:HOMESHARE -Leaf #Split user path to get the username
+        $UserPath = Split-Path $env:homePath -Leaf #Split user path to get the username
         $HomePathSet = "C:\users\$UserPath" #Set the directory to loop contents on
         Set-Location $HomePathSet #set Path to user home path
     }
