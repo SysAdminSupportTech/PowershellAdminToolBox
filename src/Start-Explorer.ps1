@@ -47,7 +47,7 @@ Function ChildFolder {
             $userPath = $ChildDir[$userInput]
             Push-Location $userPath
             $Message = Get-Location
-            Write-Host "You Are Currently Working $Message Directory(This is the child Folder Acion)"                     
+            Write-Host "You Are Currently Working $Message Directory"                
             }
         }
         Else {
@@ -69,7 +69,7 @@ Function ChildFolder {
                     $arrayVal = $filePath.Add($file)
                     Write-Host "$arrayVal) $filePath"
                }
-                $UserInput = Read-Host "SELECT A FILE TO OPEN"
+                $UserInput = Read-Host "SELECT A FILE TO OPEN OR (BB) FOR BACK"
                #********************************************
                if($userInput -eq "BB"){
                     Pop-Location
