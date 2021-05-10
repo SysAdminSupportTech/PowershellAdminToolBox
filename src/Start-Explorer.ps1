@@ -18,19 +18,17 @@ Function FolderAction {
                 Write-Host "$arrayIndex) $file_folder Directory"
             }
             Else{Write-Host "$arrayIndex) $file_folder File"}
-        }
-         
+        } 
     }
 }
 Function ChildFolder {
-    Clear-Host
+    
     #Set the current path to user choice
     #Checking for the existence of a Directory in the current Location
     if (((Get-ChildItem -Path .\ -Directory).Count) -ne 0) {
         $ChildDir = Get-ChildItem -Path .\ -Directory -Force
         ForEach ($dir in $ChildDir) {
             #$subDirectoryCount = (Get-ChildItem $dir -Directory).Count
-  
         }
         FolderAction #function
         "`n"
@@ -43,12 +41,13 @@ Function ChildFolder {
                     Pop-Location
                     Write-Host "Redirecting..."
                     Start-Sleep -Seconds 5
-                    start-UCExplorer
-              }Else{
+                    #What should be done if a folder is empty
+        }Else{
+            Clear-Host
             $userPath = $ChildDir[$userInput]
             Push-Location $userPath
             $Message = Get-Location
-            Write-Host "You Are Currently Working $Message Directory"
+            Write-Host "You Are Currently Working $Message Directory"                
             }
         }
         Else {
@@ -60,12 +59,28 @@ Function ChildFolder {
 
                 $filePath2 = $filePath[$userInput]
                 Invoke-Item -Path .\$filePath2
-            
         }
            
+  } Else {
+                Clear-Host
+                $filePath = [System.Collections.ArrayList] @()
+                $GetDirContent = Get-ChildItem .\
+                ForEach($File in $GetDirContent){
+                    $arrayVal = $filePath.Add($file)
+                    Write-Host "$arrayVal) $filePath"
+               }
+                $UserInput = Read-Host "SELECT A FILE TO OPEN OR (BB) FOR BACK"
+               #********************************************
+               if($userInput -eq "BB"){
+                    Pop-Location
+               } Else {
+               
+                    $filePath2 = $filePath[$userInput]
+                    Invoke-Item -Path .\$filePath2
+               }
     }
-    Else {}
-}
+
+} 
 Function start-UCExplorer {
     [cmdletbinding()]
     param()
@@ -90,7 +105,7 @@ Function start-UCExplorer {
                 $UserOption = $folders[$userInput]
                 Push-Location .\$userOption
                 $Message = Get-Location
-                Write-Host "You Are Currently Working $Message Directory)"
+                Write-Host "You Are Currently Working $Message Directory"
 
                 #checking if the directory is empty or not, then send a message to user
                 #Error Message Gotten from here.
