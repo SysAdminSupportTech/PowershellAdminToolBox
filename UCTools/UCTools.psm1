@@ -200,6 +200,7 @@ The Above script transfer all the files in the File Directory. Note that transfe
 
 #>
 function File-UCTransfer {
+
     [cmdletBinding()]
     param (
         [String]
@@ -219,8 +220,7 @@ function File-UCTransfer {
         #check for the existence of a file before sending it
         
         Try{
-          Invoke-Command -ComputerName $ComputerName -ScriptBlock{New-Item -Path $Using:FileDestination -Name UCTransfer -ItemType Directory -ErrorAction SilentlyContinue} -ArgumentList $FileDestination
-          Copy-Item -Path $Origin -Destination $FileDestination\UCTransfer -ToSession $EstPSSession -Recurse -ErrorAction Stop
+          Copy-Item -Path $Origin -Destination $FileDestination -ToSession $EstPSSession -Recurse -ErrorAction Stop -PassThru -Force
         }
 
         Catch [System.IO.IOException]{
@@ -228,7 +228,7 @@ function File-UCTransfer {
         }
     }
     End{
-            Write-Host "Your File has been sent to the Desktop of the user '$FileDestination'" -BackgroundColor Black -ForegroundColor DarkGreen
+            Write-Host "Your File has been sent to the Desktop of the user '$FileDestination'" -BackgroundColor Black -ForegroundColor Green
             Get-PSSession | Remove-PSSession
 
     }
@@ -324,90 +324,119 @@ function Uninstall-UCWindowsApp{
     }
 }
 
-#--------------------------------------Ping computers from ADGroup or from CSV file --------------------------------------
-function Ping-UCTestComputerOnlineStatusFromFile{
-<#
-.DESCRIPTION
-This cmdlet command ping all the computers in a csv file and output computers responding and not responding to the
-file path specified by the user.
- 
-.EXAMPLE
-1. Ping computers in a file 
+#---------------------------------------------------------Rename-UCUserProfile.ps1 and Revert-UCUserProfile.ps1-------------------------#
 
-Ping-UCTestComputerOnlineStatusFromFile -CSVPath C:\users\userpath\file.csv -saveFilePath C:\users\Userpath\
-
-NOTE: the [-saveFilePathe] accept path as an argument without the file name.
-
-.EXAMPLE
-
-2. Ping computers in a file and export those responding on the network to csv file
-
-Ping-UCTestComputerOnlineStatusFromFile -CSVPath C:\users\userpath\file.csv -$SaveFilePath C:\user\userpath\
-NOTE: the [-saveFilePathe] accept path as an argument without the file name.
-#>
-    [cmdletbinding ()]
-
-    param( 
-       [parameter(Mandatory=$true)]
-       [string]$CSVPath,
-       $SaveFilePath
-    )
-      Process{
-      $Computer = (Import-Csv -Path $CSVPath).ComputerName 
-      ForEach($Comp in $Computer){
-         $compStatus = Test-Connection -ComputerName $Comp -Count 1 -Quiet -ErrorAction Stop
-         if($compStatus){
-            Write-Host $Comp "Online"
-            $comp | Out-File $CSVExport\ComputerOnline.csv -Append
-         }Else{
-            Write-Host $Comp "offline"
-            $comp | Out-File $CSVExport\ComputerNotResponding.csv -Append
-
-         }
-        }
-    }
- }   
-
-function Ping-UCTestComputerOnlineStatusFromADGroup{
+#Welcome to registry file 
+function Rename-UCUserProfile{
 <#
 .SYNOPSIS
-Get all computers that are currently connected to the domain and export these computers to a CSV file
+Renaming user profile for troubleshooting purpose
 
 .DESCRIPTION
-This cmdlet test the status of computers if they are currently online or not. 
+This cmdlet allow a technician to rename a user profile to .old for troubleshooting purpose. 
 
 .EXAMPLE
+Rename-UCUserProfile -ComputerName NGMXL9293LDM
 
-Ping computers in a specific ADgroup
-
-Ping-UCTestComputerOnlineStatusFromADGroup -ADGroup "NGA-CLIENT-CD" -SaveFilePath C:\Powershell\ucmodule
-
-NOTE: the [-saveFilePathe] accept path as an argument without the file name.
+The above line accept computer as a parameter. 
 #>
-    [cmdletbinding ()]
 
-    param(  
-       [parameter(Mandatory=$true)]
-       $ADGroup,
-       
-       [string][parameter(Mandatory = $true)]$SaveFilePath = ''
-    )
-    if(Test-Path -Path $SaveFilePath){
-        $AdComputers = Get-ADGroupMember -Identity $ADGroup -Recursive | Select-Object -ExpandProperty Name
+[cmdletbinding()]
+param(
+    [Parameter(Mandatory = $true)] $ComputerName = 'Localhost'
+    #[Parameter(Mandatory = $true)] $UserName
+)
 
-        ForEach($computer in $AdComputers) {
-        $connection_Est = Test-Connection -ComputerName $computer -Count 1 -Quiet
-            if($connection_Est){
-                Write-Output "$computer Status: Online"
-                $computer | Out-File "$SaveFilePath\ComputerOnline.csv" -Append
-        
-           }Else{
-                Write-output "$computer offline"
-                $computer | Out-File "$SaveFilePath\ComputerNotOnline.csv" -Append
-
-            }
+Begin{
+Clear-Host
+Write-Host "WELCOME: SELECT A NUMBER FOR THE USERNAME BELOW" -ForegroundColor Green
+}
+Process{
+Try{
+    Invoke-Command -ComputerName $ComputerName -ScriptBlock{
+    $UserProfileCollection = [System.Collections.ArrayList]@()
+    $AllUsers = (Get-ChildItem -Path C:\Users\).Name
+    ForEach($User in $AllUsers){
+        $ArrayVal = $UserProfileCollection.Add($User)
+        Write-Host "$ArrayVal) $User"
         }
-    }Else {
-       Write-Warning "The Path you specified does not exit. Please check again"
-    }  
+    $UserPrompt = Read-Host
+    $userVal = $UserProfileCollection[$UserPrompt]
+    Write-Host "$UserVal has Been Selected."
+    Write-Host "Processing. . ."
+    Start-Sleep -Seconds 3 
+    Rename-Item -Path C:\Users\$userVal -NewName "$userVal.OLD" -Force -PassThru
+    Write-Warning "Username '$UserVal' has been renamed to $UserVal.OLD"
+
+    #Renaming the User Profile in Registry
+    [string]$USERSID = (Get-CimInstance -ClassName Win32_UserProfile |
+    Where-Object {$_.LocalPath -like "*C:\users\$userVal*"}).SID
+    Write-Output $USERSID
+
+    Get-Item -path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\$USERSID" |
+    Rename-Item -NewName "$USERSID.OLD" -Force -PassThru
+    }
+}
+Catch [System.Management.Automation.Remoting.PSRemotingTransportException] {
+    Write-Warning "$ComputerName is Currently Not Online"
+} 
+Catch {Write-Warning "An Error has Occured. Check and try again"}
+    
+}
+End{}
+}
+function Revert-UCUserProfile{
+<#
+.SYNOPSIS
+Reverting the user profile to the correct username. Example Jbethelite.OLD to Jbethelite
+
+.DESCRIPTION
+This cmdlet allow a technician to revert a change his has made to a user profile. 
+
+.EXAMPLE
+Revert-UCUserProfile -ComputerName NGMXL9293LDM
+
+The above line accept computer as a parameter. 
+#>
+[cmdletbinding()]
+param(
+    [Parameter(Mandatory = $true)] $ComputerName = 'Localhost'   
+)
+Begin{
+Clear-Host
+Write-Host "WELCOME: TO REVERT YOUR CHANGES, SELECT A NUMBER FOR THE USERNAME" -ForegroundColor Green
+}
+Process{
+Invoke-Command -ComputerName $ComputerName -ScriptBlock{
+    $UserProfileCollection = [System.Collections.ArrayList]@()
+    $ContentVals = [System.Collections.ArrayList]@()
+    $AllUsers = (Get-ChildItem -Path C:\Users\).Name
+    ForEach($User in $AllUsers){
+        $ArrayVal = $UserProfileCollection.Add($User)
+        Write-Host "$ArrayVal) $User"
+        }
+    $UserPrompt = Read-Host
+    $userVal = $UserProfileCollection[$UserPrompt]
+    Write-Host "$UserVal has Been Selected."
+    Write-Host "Processing. . ."
+    Start-Sleep -Seconds 3
+
+    $USERNAME = Read-Host "RETYPE USERNAME AGAIN WITHOUT .OLD FOR COMFIRMATION"
+    Rename-Item -Path C:\Users\$UserVal -NewName $USERNAME -Force -PassThru
+    Write-Warning "Username '$UserVal' has been renamed to '$USERNAME'"
+    #Renaming the User Profile in Registry
+    [string]$USERSID = (Get-CimInstance -ClassName Win32_UserProfile |
+    Where-Object {$_.LocalPath -like "*C:\users\$USERNAME*"}).SID
+    "`n"
+    Write-Host "THE $USERVAL SID IS '$USERSID'" -ForegroundColor DarkYellow
+    "`n"
+    $RenameUserSID = Read-Host "COPY THE ABOVE USER SID AND PASTE TO RENAME REGISTRY HIVE WITHOUT THE '.OLD'"
+    Get-Item -path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\$USERSID" |
+    Rename-Item -NewName "$RenameUserSID" -Force -PassThru
+
+  }
+}
+End{
+    Write-warning "To delete a User profile(s) from any remote Computer, please use the Scripted Support Tool (SST) Cmdlet called Remove-UserProfile"
+    }
 }
