@@ -10,7 +10,7 @@ function Wait-KeyPress{
     do{
         if([Console]::KeyAvailable){}
         $KeyInfo = [Console]::ReadKey($false)
-    } until($KeyInfo.Key -eq $Key)
+    } until($KeyInfo -eq $Key)
 }
 
 'First Part'
