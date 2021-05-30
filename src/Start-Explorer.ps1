@@ -21,8 +21,28 @@ Function FolderAction {
         } 
     }
 }
+#Navigation Button function
+Function Navigation{
+
+  param(
+    [String]
+    $Message = "Enter 'B' to Go Back..."
+
+  )
+ Add-Type -AssemblyName WindowsBase
+ Add-Type -AssemblyName PresentationCore 
+ $Key = [System.Windows.Input.Key]::B
+
+ Write-Output -InputObject $Message
+ Do{
+    $BackKey = [System.Windows.Input.Keyboard]::IsKeyDown($key)
+    if($BackKey){
+        Pop-Location
+    }
+ }while($BackKey -ne $Key)
+}
+
 Function ChildFolder {
-    
     #Set the current path to user choice
     #Checking for the existence of a Directory in the current Location
     if (((Get-ChildItem -Path .\ -Directory).Count) -ne 0) {
@@ -34,7 +54,21 @@ Function ChildFolder {
         "`n"
         $userInput = Read-Host "SELECT AN UPTION ABOVE TO OPEN A FILE/FOLDER"
         $ChildUserOption = $ChildDir[$userInput]
-        if (($ChildDir[$userInput]) -is [System.IO.DirectoryInfo]) {
+
+        #Navigation Button
+        if($userInput -eq "B"){
+               #Checking the current location path.
+               $Location = Get-Location
+               $UserPath = Split-Path $env:homePath -Leaf #Split user path to get the username
+               $UserHome = "C:\users\$UserPath" #Set the directory to loop contents on
+               if($UserHome -eq $Location){
+                       Pop-Location
+                       Set-Location -Path $UserHome
+                       start-UCExplorer
+               } Else {Pop-Location}
+
+            }
+        Elseif(($ChildDir[$userInput]) -is [System.IO.DirectoryInfo]) {
             #Checking if a Directory is empty or not
             if((Get-ChildItem) -eq $Null){
                     Write-Host "Sorry, This Directory is empty"
@@ -47,6 +81,7 @@ Function ChildFolder {
             $userPath = $ChildDir[$userInput]
             Push-Location $userPath
             $Message = Get-Location
+            Clear-Host
             Write-Host "You Are Currently Working $Message Directory"                
             }
         }
@@ -69,9 +104,9 @@ Function ChildFolder {
                     $arrayVal = $filePath.Add($file)
                     Write-Host "$arrayVal) $filePath"
                }
-                $UserInput = Read-Host "SELECT A FILE TO OPEN OR (BB) FOR BACK"
+                $UserInput = Read-Host "SELECT A FILE TO OPEN OR (B) FOR BACK"
                #********************************************
-               if($userInput -eq "BB"){
+               if($userInput -eq "B"){
                     Pop-Location
                } Else {
                
@@ -79,7 +114,6 @@ Function ChildFolder {
                     Invoke-Item -Path .\$filePath2
                }
     }
-
 } 
 Function start-UCExplorer {
     [cmdletbinding()]
@@ -137,7 +171,7 @@ Function start-UCExplorer {
                         ChildFolder #function 18
                         ChildFolder #function 19
                         ChildFolder #function 20 
-                }
+                    }
                  
                 }
                 Catch [System.ComponentModel.Win32Exception] {
