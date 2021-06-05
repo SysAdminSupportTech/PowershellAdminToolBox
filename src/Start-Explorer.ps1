@@ -58,17 +58,6 @@ Function ChildFolder {
             }
             Else{Write-Host "$arrayIndex) $file_folder File"}
         } 
-        #*********************************************************
-        <#
-        $ChildDir = Get-ChildItem -Path .\ -Directory -Force
-        ForEach ($dir in $ChildDir) {
-            #$subDirectoryCount = (Get-ChildItem $dir -Directory).Count
-        }
-        #FolderAction #function
-        "`n"
-        $userInput = Read-Host "SELECT AN UPTION ABOVE TO OPEN A FILE/FOLDER"
-        $ChildUserOption = $ChildDir[$userInput]
-        #>
         "`n"
         $Userinput = Read-Host "ENTER (B) TO GO BACK"
         
@@ -81,8 +70,11 @@ Function ChildFolder {
                if($UserHome -eq $Location){
                        Pop-Location
                        Set-Location -Path $UserHome
-                       start-UCExplorer
-               } Else {Pop-Location}
+                       User-WorkSpace
+               } Else {
+                        Clear-Host
+                        Pop-Location
+                        }
 
             }
         Elseif(($Contents[$userInput]) -is [System.IO.DirectoryInfo]) {
@@ -136,7 +128,21 @@ Function ChildFolder {
                }
     }
 } 
-Function start-UCExplorer {
+Function Root-Folder{
+    Set-Location C:\
+    Write-Warning "Welcome to The Root Directory."
+    ChildFolder #function 1
+    ChildFolder #function 2
+    ChildFolder #function 3
+    ChildFolder #function 4
+    ChildFolder #function 5
+    ChildFolder #function 6
+    ChildFolder #function 7
+    ChildFolder #function 8
+    ChildFolder #function 9
+    ChildFolder #function 10
+}
+Function User-WorkSpace {
     [cmdletbinding()]
     param()
     Begin {
@@ -170,7 +176,7 @@ Function start-UCExplorer {
                     Pop-Location
                     Write-Host "Redirecting..."
                     Start-Sleep -Seconds 5
-                    start-UCExplorer
+                    User-WorkSpace
                 } Else {
                         #Getting the content of the childItem
                         ChildFolder #function 1
@@ -207,10 +213,23 @@ Function start-UCExplorer {
         Else {
             Write-Host "Processing $UserOption, Please Wait..." -ForegroundColor Green
             Invoke-Item -Path .\$UserOption
-            start-UCExplorer
+            User-WorkSpace #function
             
         } #>
     }
     End {}
 }
+
+Function start-UCExplorer{
+    "`n"
+    Write-Host "Welcome To PowerShell File-Explorer..." -ForegroundColor Green
+    "`n"
+    $UserRequest = Read-Host "SELECT: (W) For User-Workspace or (R) For Root Directory"
+    "`n"
+    switch($UserRequest){
+        "W"{User-WorkSpace}
+        "R"{Root-Folder}
+    }
+}
+
 start-UCExplorer
