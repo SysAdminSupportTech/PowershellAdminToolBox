@@ -3,6 +3,41 @@ Function ActionPrompt {
   
     Write-Host "(1) Open (2) Copy (3) Move (4) Delete (5) Rename (6) Check Properties (7) Create New Folder (8) Copy-Path (0) Back"
 }
+Function Action-buttons{
+<#
+1. Give access to: Permissions
+2. Compress
+3. Copy
+4. Cut
+5. Delete
+6. Rename
+7. Properties
+8. Scan with Antivirus
+9. Create new folder
+10. Copy path
+11. Get History
+#>
+#Creating a static array
+Write-Host "SELECT A NUMBER TO PERFORM AN ACTION" -ForegroundColor Green
+$keyValues = [System.Collections.ArrayList]@('Copy','Cut','Rename','Propertise','New Folder','New File','Copy Path','Permission','Get History')
+ForEach ($vals in $keyValues){
+    $ArrayVals = $keyValues.IndexOf($vals)
+    Write-Host "$ArrayVals. $vals" 
+}
+$UserAction = Read-Host "TYPE VALUE"
+switch($UserAction){
+        0{write-host "You want to copy"}
+        1{write-host "YOu want to Cut"}
+        2{write-host "YOu want to Rename"}
+        3{write-host "YOu want to Propertise"}
+        4{write-host "YOu want to New Folder"}
+        5{write-host "YOu want to New File"}
+        6{write-host "YOu want to Copy Path"}
+        7{write-host "YOu want to Permission"}
+        8{write-host "YOu want to Get History"}
+
+    }
+}
 Function FolderAction {
     [cmdletbinding()]
     param()
@@ -229,8 +264,6 @@ Function Root-Folder{
     }
     End {}
 }
-
-
 Function User-WorkSpace {
     [cmdletbinding()]
     param()
@@ -308,7 +341,6 @@ Function User-WorkSpace {
     }
     End {}
 }
-
 Function start-UCExplorer{
 Clear-Host
     Write-Host "Welcome To PowerShell File-Explorer..." -ForegroundColor Green
@@ -320,4 +352,4 @@ Clear-Host
     }
 }
 
-start-UCExplorer
+Action-buttons
