@@ -22,25 +22,6 @@ Function FolderAction {
     }
 }
 #Navigation Button function
-Function Navigation{
-
-  param(
-    [String]
-    $Message = "Enter 'B' to Go Back..."
-
-  )
- Add-Type -AssemblyName WindowsBase
- Add-Type -AssemblyName PresentationCore 
- $Key = [System.Windows.Input.Key]::B
-
- Write-Output -InputObject $Message
- Do{
-    $BackKey = [System.Windows.Input.Keyboard]::IsKeyDown($key)
-    if($BackKey){
-        Pop-Location
-    }
- }while($BackKey -ne $Key)
-}
 
 Function ChildFolder {
     #Set the current path to user choice
@@ -147,6 +128,7 @@ Function RChildDir {
                $RLocation = Get-Location
                if($Userinput -eq $RLocation){
                        Pop-Location
+                       Push-Location C:\
                } Else {
                         Clear-Host
                         Pop-Location
