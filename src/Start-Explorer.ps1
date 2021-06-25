@@ -4,29 +4,35 @@ Function ActionPrompt {
     Write-Host "(1) Open (2) Copy (3) Move (4) Delete (5) Rename (6) Check Properties (7) Create New Folder (8) Copy-Path (0) Back"
 }
 Function Action-buttons{
-<#
-1. Give access to: Permissions
-2. Compress
-3. Copy
-4. Cut
-5. Delete
-6. Rename
-7. Properties
-8. Scan with Antivirus
-9. Create new folder
-10. Copy path
-11. Get History
-#>
-#Creating a static array
+[cmdletbinding()]
+param(
+    [int]$inputObject
+)
+
+#Looping through the contents of the current directory and performed action based on what was selected
+$ActionLoopActive = [System.Collections.ArrayList]@()
+$ActiondirsFile = Get-ChildItem -Path .\
+ForEach($ActionContent in $ActiondirsFile){
+    $ActionArrayVals = $ActionLoopActive.Add($ActionContent) #Adding All directories index value to the empty array created
+}
+
+$UserSelectedObj = $ActionLoopActive[$inputObject] #Display the File Selected and tell user What action he want to perform
+Write-Host "FILE SELECTED: $UserSelectedObj" -BackgroundColor White -ForegroundColor Black
+
+#Creating a static action Array and asking the user what he want to do with the file selected
 Write-Host "SELECT A NUMBER TO PERFORM AN ACTION" -ForegroundColor Green
 $keyValues = [System.Collections.ArrayList]@('Copy','Cut','Rename','Propertise','New Folder','New File','Copy Path','Permission','Get History')
 ForEach ($vals in $keyValues){
     $ArrayVals = $keyValues.IndexOf($vals)
     Write-Host "$ArrayVals. $vals" 
 }
-$UserAction = Read-Host "TYPE VALUE"
-switch($UserAction){
-        0{write-host "You want to copy"}
+$UserDecisionONSelectedFile = Read-Host "TYPE HERE"
+
+switch($UserDecisionONSelectedFile){
+        0{
+            Write-Host "Let me start performing action on $UserSelectedObj"
+            $UserSelectedObj.GetType()
+        }
         1{write-host "YOu want to Cut"}
         2{write-host "YOu want to Rename"}
         3{write-host "YOu want to Propertise"}
@@ -351,5 +357,4 @@ Clear-Host
         "R"{Root-Folder}
     }
 }
-
-Action-buttons
+Action-buttons -inputObject -1
