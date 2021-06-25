@@ -3,6 +3,47 @@ Function ActionPrompt {
   
     Write-Host "(1) Open (2) Copy (3) Move (4) Delete (5) Rename (6) Check Properties (7) Create New Folder (8) Copy-Path (0) Back"
 }
+Function Action-buttons{
+[cmdletbinding()]
+param(
+    [int]$inputObject
+)
+
+#Looping through the contents of the current directory and performed action based on what was selected
+$ActionLoopActive = [System.Collections.ArrayList]@()
+$ActiondirsFile = Get-ChildItem -Path .\
+ForEach($ActionContent in $ActiondirsFile){
+    $ActionArrayVals = $ActionLoopActive.Add($ActionContent) #Adding All directories index value to the empty array created
+}
+
+$UserSelectedObj = $ActionLoopActive[$inputObject] #Display the File Selected and tell user What action he want to perform
+Write-Host "FILE SELECTED: $UserSelectedObj" -BackgroundColor White -ForegroundColor Black
+
+#Creating a static action Array and asking the user what he want to do with the file selected
+Write-Host "SELECT A NUMBER TO PERFORM AN ACTION" -ForegroundColor Green
+$keyValues = [System.Collections.ArrayList]@('Copy','Cut','Rename','Propertise','New Folder','New File','Copy Path','Permission','Get History')
+ForEach ($vals in $keyValues){
+    $ArrayVals = $keyValues.IndexOf($vals)
+    Write-Host "$ArrayVals. $vals" 
+}
+$UserDecisionONSelectedFile = Read-Host "TYPE HERE"
+
+switch($UserDecisionONSelectedFile){
+        0{
+            Write-Host "Let me start performing action on $UserSelectedObj"
+            $UserSelectedObj.GetType()
+        }
+        1{write-host "YOu want to Cut"}
+        2{write-host "YOu want to Rename"}
+        3{write-host "YOu want to Propertise"}
+        4{write-host "YOu want to New Folder"}
+        5{write-host "YOu want to New File"}
+        6{write-host "YOu want to Copy Path"}
+        7{write-host "YOu want to Permission"}
+        8{write-host "YOu want to Get History"}
+
+    }
+}
 Function FolderAction {
     [cmdletbinding()]
     param()
@@ -22,39 +63,26 @@ Function FolderAction {
     }
 }
 #Navigation Button function
-Function Navigation{
-
-  param(
-    [String]
-    $Message = "Enter 'B' to Go Back..."
-
-  )
- Add-Type -AssemblyName WindowsBase
- Add-Type -AssemblyName PresentationCore 
- $Key = [System.Windows.Input.Key]::B
-
- Write-Output -InputObject $Message
- Do{
-    $BackKey = [System.Windows.Input.Keyboard]::IsKeyDown($key)
-    if($BackKey){
-        Pop-Location
-    }
- }while($BackKey -ne $Key)
-}
 
 Function ChildFolder {
     #Set the current path to user choice
     #Checking for the existence of a Directory in the current Location
     if (((Get-ChildItem -Path .\ -Directory).Count) -ne 0) {
-        $ChildDir = Get-ChildItem -Path .\ -Directory -Force
-        ForEach ($dir in $ChildDir) {
-            #$subDirectoryCount = (Get-ChildItem $dir -Directory).Count
-        }
-        FolderAction #function
-        "`n"
-        $userInput = Read-Host "SELECT AN UPTION ABOVE TO OPEN A FILE/FOLDER"
-        $ChildUserOption = $ChildDir[$userInput]
+        #********************************************************
+        $Contents = [System.Collections.ArrayList]@()
+        Write-Host "SELECT FROM THE NUMBER BELOW TO OPEN A FOLDER\fILES" -ForegroundColor Green 
+        $File_folders = Get-ChildItem .\
+        ForEach($file_folder in $File_folders) {
+            $ArrayIndex = $Contents.Add($file_folder)
 
+            if(($file_folder) -is [System.IO.DirectoryInfo]){
+                Write-Host "$arrayIndex) $file_folder Directory"
+            }
+            Else{Write-Host "$arrayIndex) $file_folder File"}
+        } 
+        "`n"
+        $Userinput = Read-Host "ENTER (B) TO GO BACK"
+        
         #Navigation Button
         if($userInput -eq "B"){
                #Checking the current location path.
@@ -64,11 +92,14 @@ Function ChildFolder {
                if($UserHome -eq $Location){
                        Pop-Location
                        Set-Location -Path $UserHome
-                       start-UCExplorer
-               } Else {Pop-Location}
+                       User-WorkSpace
+               } Else {
+                        Clear-Host
+                        Pop-Location
+                        }
 
             }
-        Elseif(($ChildDir[$userInput]) -is [System.IO.DirectoryInfo]) {
+        Elseif(($Contents[$userInput]) -is [System.IO.DirectoryInfo]) {
             #Checking if a Directory is empty or not
             if((Get-ChildItem) -eq $Null){
                     Write-Host "Sorry, This Directory is empty"
@@ -78,14 +109,14 @@ Function ChildFolder {
                     #What should be done if a folder is empty
         }Else{
             Clear-Host
-            $userPath = $ChildDir[$userInput]
+            $userPath = $Contents[$userInput]
             Push-Location $userPath
             $Message = Get-Location
             Clear-Host
             Write-Host "You Are Currently Working $Message Directory"                
             }
         }
-        Else {
+        Elseif(($Contents[$userInput]) -is [System.IO.FileInfo]){
                 $filePath = [System.Collections.ArrayList] @()
                 $GetDirContent = Get-ChildItem .\
                 ForEach($File in $GetDirContent){
@@ -93,7 +124,10 @@ Function ChildFolder {
                 }
 
                 $filePath2 = $filePath[$userInput]
+                Write-Host "Processing $filePath2, Please Wait..." -ForegroundColor Green
                 Invoke-Item -Path .\$filePath2
+        } Else {
+                Write-Warning "You Enter The Wrong Key: Enter (B) for Back, Or Enter The Number That Correspond to the Folder/File"
         }
            
   } Else {
@@ -111,11 +145,132 @@ Function ChildFolder {
                } Else {
                
                     $filePath2 = $filePath[$userInput]
+                    Write-Host "Processing $filePath2, Please Wait..." -ForegroundColor Green
                     Invoke-Item -Path .\$filePath2
                }
     }
 } 
-Function start-UCExplorer {
+Function RChildDir {
+#listing All Items of Root Folder
+    $RContents = [System.Collections.ArrayList]@()
+    Write-Host "SELECT FROM THE NUMBER BELOW TO OPEN A FOLDER\fILES" -ForegroundColor Green 
+    $RFile_folders = Get-ChildItem .\
+    ForEach($Rfile_folder in $RFile_folders) {
+          $ArrayIndex = $RContents.Add($Rfile_folder)
+          if(($Rfile_folder) -is [System.IO.DirectoryInfo]){
+                Write-Host "$arrayIndex) $Rfile_folder Directory"
+            }
+            Else{Write-Host "$arrayIndex) $Rfile_folder File"}
+        }
+      #Requesting User input
+      $Userinput = Read-Host "ENTER (B) TO GO BACK"
+      if($userInput -eq "B"){
+               #Checking the current location path.
+               $RLocation = Get-Location
+               if($Userinput -eq $RLocation){
+                       Pop-Location
+                       Push-Location C:\
+               } Else {
+                        Clear-Host
+                        Pop-Location
+                        }
+               }
+       Elseif(($RContents[$userInput]) -is [System.IO.DirectoryInfo]) {
+            #Checking if a Directory is empty or not
+            if((Get-ChildItem) -eq $Null){
+                    Write-Host "Sorry, This Directory is empty"
+                    Pop-Location
+                    Write-Host "Redirecting..."
+                    Start-Sleep -Seconds 5
+                    #What should be done if a folder is empty
+         }  Else{
+                Clear-Host
+                $userPath = $RContents[$userInput]
+                Push-Location
+                $Message = Get-Location
+                Clear-Host
+                Write-Host "You Are Currently Working $Message Directory"                
+                }
+        }
+
+       Elseif(($RContents[$userInput]) -is [System.IO.FileInfo]){
+                    $RfilePath = [System.Collections.ArrayList] @()
+                    $GetDirContent = Get-ChildItem .\
+                    ForEach($File in $GetDirContent){
+                        $Null = $RfilePath.Add($file)
+                    }
+
+                    $RfilePath2 = $RfilePath[$userInput]
+                    Write-Host "Processing $filePath2, Please Wait..." -ForegroundColor Green
+                    Invoke-Item -Path .\$RfilePath2
+            }
+       Else {
+                Write-Warning "You Enter The Wrong Key: Enter (B) for Back, Or Enter The Number That Correspond to the Folder/File"
+        }
+}
+Function Root-Folder{
+    Process {
+        Push-Location C:\
+        FolderAction #function
+        $Folders = [System.Collections.ArrayList]@()
+        "`n"
+        Get-ChildItem .\ | ForEach-Object {
+            $null = $folders.Add("$_") #adding folders name to the empty array bucket
+        }
+        $userInput = Read-Host -Prompt "Enter A Number to Open Folder or File"
+        #Checking if value seleted is a file or folder
+        $UserOption = $Folders[$userInput]                 
+        if ((Get-Item -path $userOption) -is [System.IO.DirectoryInfo]) {
+            Try{
+                $UserOption = $folders[$userInput]
+                Push-Location .\$userOption
+                $Message = Get-Location
+                Clear-Host
+                Write-Host "You Are Currently Working $Message Directory"
+
+                #checking if the directory is empty or not, then send a message to user
+                #Error Message Gotten from here.
+                Write-Host "im here"
+                if((Get-ChildItem) -eq $Null){
+                    Write-Host "Sorry, This Directory is empty"
+                    Pop-Location
+                    Write-Host "Redirecting..."
+                    Start-Sleep -Seconds 5
+                    Root-Folder #Function
+                } Else {
+                        #Getting the content of the childItem
+                        RchildDir #function 1
+                        RChildDir #function 2
+                        RChildDir #Function 3
+                        RChildDir #Function 4
+                        RChildDir #Function 5
+                        RChildDir #Function 6
+                        RChildDir #Function 7
+                        RChildDir #Function 8
+                        RChildDir #Function 9
+                        RChildDir #Function 10
+                    }
+                 
+                }
+                Catch [System.ComponentModel.Win32Exception] {
+                    $Error[0].exception
+                }
+                Catch [System.Management.Automation.RuntimeException] {
+                    $Error[0].exception
+                }
+            
+        }
+        Else {
+            Clear-Host
+            Write-Host "Processing $UserOption, Please Wait..." -ForegroundColor Green
+            Invoke-Item -Path .\$UserOption
+            Root-folder #function
+            
+        } #>
+    }
+    End {}
+}
+Function User-WorkSpace {
     [cmdletbinding()]
     param()
     Begin {
@@ -139,6 +294,7 @@ Function start-UCExplorer {
                 $UserOption = $folders[$userInput]
                 Push-Location .\$userOption
                 $Message = Get-Location
+                Clear-Host
                 Write-Host "You Are Currently Working $Message Directory"
 
                 #checking if the directory is empty or not, then send a message to user
@@ -148,7 +304,7 @@ Function start-UCExplorer {
                     Pop-Location
                     Write-Host "Redirecting..."
                     Start-Sleep -Seconds 5
-                    start-UCExplorer
+                    User-WorkSpace
                 } Else {
                         #Getting the content of the childItem
                         ChildFolder #function 1
@@ -183,10 +339,22 @@ Function start-UCExplorer {
             
         }
         Else {
+            Write-Host "Processing $UserOption, Please Wait..." -ForegroundColor Green
             Invoke-Item -Path .\$UserOption
+            User-WorkSpace #function
             
         } #>
     }
     End {}
 }
-start-UCExplorer
+Function start-UCExplorer{
+Clear-Host
+    Write-Host "Welcome To PowerShell File-Explorer..." -ForegroundColor Green
+    $UserRequest = Read-Host "SELECT: (W) For User-Workspace or (R) For Root Directory"
+    "`n"
+    switch($UserRequest){
+        "W"{User-WorkSpace}
+        "R"{Root-Folder}
+    }
+}
+Action-buttons -inputObject -1
