@@ -27,11 +27,48 @@ ForEach ($vals in $keyValues){
     Write-Host "$ArrayVals. $vals" 
 }
 $UserDecisionONSelectedFile = Read-Host "TYPE HERE"
-
 switch($UserDecisionONSelectedFile){
         0{
-            Write-Host "Let me start performing action on $UserSelectedObj"
-            $UserSelectedObj.GetType()
+            Write-Host "You Want to Copy $UserSelectedObj to Another Folder" -ForegroundColor DarkGreen
+            $CopyPath = Read-Host "ENTER FILEPATH"
+            #Copy Selected item to path specified by the user
+            if(Test-Path $CopyPath){
+                #Checking for the existence of Same File in Directory Specified By User
+                if(Test-Path -Path "$CopyPath\$UserSelectedObj"){
+                    Write-Warning "$UserSelectedObj exist in this Directory"
+                    #UserDecision
+                    Write-Host "File Exist: WHAT DO YOU WANT NEXT"
+                    Write-Host "R: for REPLACE"
+                    Write-Host "D: for DUPLICATE"
+                    Write-Host "C: for COMPARE"
+                    "`n"
+                    $UserDecision = Read-Host "TYPE HERE "
+                    switch($userDecision){
+                        'R'{
+                                $ReplaceFile = Get-Item -Path "$CopyPath\$UserSelectedObj"
+                                Write-Warning "Are You Sure You Want to Replace this file ($UserSelectedObj) (Y/N) "
+
+                                $comfirmUserAction = Read-Host 
+                                if($comfirmUserAction -eq "Y"){
+                                    $ReplaceFile | Remove-Item
+                                    Copy-Item -Path .\$UserSelectedObj -Destination $CopyPath
+                                    Write-Host "Your File Has Been Replaced Successfully" -ForegroundColor Magenta
+                                }Else {
+                                    Write-Host "Ohhh. No Action taken. Copy aborted..."
+                                }
+                            }
+                        'D'{}
+                        'C'{}
+                        default{"NoN of The Option Selected"}
+                    }
+                } Else{
+                    Copy-Item -Path .\$UserSelectedObj -Destination $CopyPath -PassThru
+                    Write-Host "Your File Has Been Copied Successfully to $CopyPath" -ForegroundColor Magenta
+                } #------- End of Checking if file in the same directory
+
+            } Else {
+                Write-Warning "The Path ($CopyPath) You Specified Does not Exits. Please Check an try again"
+            } #----- End of script for user path existed.
         }
         1{write-host "YOu want to Cut"}
         2{write-host "YOu want to Rename"}
@@ -357,4 +394,4 @@ Clear-Host
         "R"{Root-Folder}
     }
 }
-Action-buttons -inputObject -1
+Action-buttons -inputObject -8
