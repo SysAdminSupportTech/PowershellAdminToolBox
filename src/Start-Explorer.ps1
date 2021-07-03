@@ -38,9 +38,9 @@ switch($UserDecisionONSelectedFile){
                     Write-Warning "$UserSelectedObj exist in this Directory"
                     #UserDecision
                     Write-Host "File Exist: WHAT DO YOU WANT NEXT"
-                    Write-Host "R: for REPLACE"
-                    Write-Host "D: for DUPLICATE"
-                    Write-Host "C: for COMPARE"
+                    Write-Host "R: For REPLACE"
+                    Write-Host "D: For Duplicate"
+             
                     "`n"
                     $UserDecision = Read-Host "TYPE HERE "
                     switch($userDecision){
@@ -48,7 +48,7 @@ switch($UserDecisionONSelectedFile){
                                 $ReplaceFile = Get-Item -Path "$CopyPath\$UserSelectedObj"
                                 Write-Warning "Are You Sure You Want to Replace this file ($UserSelectedObj) (Y/N) "
 
-                                $comfirmUserAction = Read-Host 
+                                $comfirmUserAction = Read-Host "Type Here" 
                                 if($comfirmUserAction -eq "Y"){
                                     $ReplaceFile | Remove-Item
                                     Copy-Item -Path .\$UserSelectedObj -Destination $CopyPath
@@ -56,9 +56,38 @@ switch($UserDecisionONSelectedFile){
                                 }Else {
                                     Write-Host "Ohhh. No Action taken. Copy aborted..."
                                 }
+                            } #------- End of Replace Action
+                        'D'{
+                            #Creatign a duplicate of the file. this means renaming it with another name
+                            $FileDuplicate = Get-Item -Path $CopyPath\$UserSelectedObj
+                            $userFileName = Read-Host "Type The New Name"
+                            #Checking if the user type a name of file
+                            if($userFileName -ne [string]::Empty){
+                                [string]$Rename = Get-Date -DisplayHint Time
+                                $RUserSelectedObj = $Rename.Replace(":","")
+                                $RUserSelectedObjDate = $RUserSelectedObj.Replace("/","")
+
+                                #Logical decision of confirming if content selected if a file or folder
+                                if(($UserSelectedObj) -is [System.IO.DirectoryInfo]){
+                                    Write-Host "this is a directory "
+                                }Else{
+                                    $UserSelectedObjFilePath = Get-Item $UserSelectedObj
+                                    $UserSelectedObjFileExt = (Get-Item $UserSelectedObj).Extension
+                                    #Create a folder on the current directory and move file. then delete folder
+                                    $Null = New-Item -Path ".\temp" -ItemType Directory -Force #var $Null was assigned to silence output
+                                    Copy-Item -Path $UserSelectedObjFilePath -Destination ".\temp\"
+                                    #Push location and perform operation
+                                    Push-Location ".\temp\"
+                                    Get-ChildItem -Path ".\" -File | Rename-Item -NewName "$userFileName$RUserSelectedObjDate$UserSelectedObjFileExt"
+                                    #Copy file From Pushed Location to User Specified Location and pop out 
+                                    Get-ChildItem -Path .\ | Move-Item -Destination $CopyPath
+                                    Pop-Location
+                                    Remove-Item -Path ".\temp" -Force                                
+                                }
+                            } Else {
+                                Write-Host "File Name was not Changed. Copying File Cancelled"
                             }
-                        'D'{}
-                        'C'{}
+                        }#------- End of Duplicate Action
                         default{"NoN of The Option Selected"}
                     }
                 } Else{
@@ -69,7 +98,8 @@ switch($UserDecisionONSelectedFile){
             } Else {
                 Write-Warning "The Path ($CopyPath) You Specified Does not Exits. Please Check an try again"
             } #----- End of script for user path existed.
-        }
+        } #-------------------------------- end of Copy function loop
+
         1{write-host "YOu want to Cut"}
         2{write-host "YOu want to Rename"}
         3{write-host "YOu want to Propertise"}
