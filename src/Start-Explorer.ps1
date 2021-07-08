@@ -130,7 +130,6 @@ Function FolderAction {
     }
 }
 #Navigation Button function
-
 Function ChildFolder {
     #Set the current path to user choice
     #Checking for the existence of a Directory in the current Location
@@ -353,10 +352,22 @@ Function User-WorkSpace {
         Get-ChildItem .\ | ForEach-Object {
             $null = $folders.Add("$_") #adding folders name to the empty array bucket
         }
-        $userInput = Read-Host -Prompt "Enter A Number to Open Folder or File"
-        #Checking if value seleted is a file or folder
-        $UserOption = $Folders[$userInput]                 
-        if ((Get-Item -path $HomePathSet\$userOption) -is [System.IO.DirectoryInfo]) {
+        $userInput = Read-Host -Prompt "SELECT FOLDER/FILE NUMBER. ENTER (A) FOR ACTION ON FILE/FOLDER"
+        $UserOption = $Folders[$userInput]
+        #User input to decide what to do with the file
+        Write-Host "$UserOption Selected" -ForegroundColor Black -BackgroundColor White
+        $userDecision = Read-Host "(A) for File Action, (B) Proceed With UCExplorer"
+        if($userDecision -eq "A"){
+            Action-buttons -inputObject $userInput
+        }Else{
+#______________________________________________________________________________________
+                #Performing Action on User Selected File
+        if($UserOption -eq "A"){
+            "User Option is A. Now let us process our action folder"
+            #Action-buttons -inputObject $UserOption
+        }
+        #Checking if value seleted is a file or folder                 
+        Elseif ((Get-Item -path $HomePathSet\$userOption) -is [System.IO.DirectoryInfo]) {
             Try{
                 $UserOption = $folders[$userInput]
                 Push-Location .\$userOption
@@ -411,6 +422,9 @@ Function User-WorkSpace {
             User-WorkSpace #function
             
         } #>
+#_______________________________________________________________________________________            
+        }
+            
     }
     End {}
 }
@@ -424,4 +438,5 @@ Clear-Host
         "R"{Root-Folder}
     }
 }
-Action-buttons -inputObject -8
+start-UCExplorer
+#Action-buttons -inputObject -8
