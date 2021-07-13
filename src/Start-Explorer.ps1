@@ -1,8 +1,4 @@
 ﻿#Windows Explorer Simulator
-Function ActionPrompt { 
-  
-    Write-Host "(1) Open (2) Copy (3) Move (4) Delete (5) Rename (6) Check Properties (7) Create New Folder (8) Copy-Path (0) Back"
-}
 Function Action-buttons{
 [cmdletbinding()]
 param(
@@ -147,7 +143,7 @@ Function ChildFolder {
             Else{Write-Host "$arrayIndex) $file_folder File"}
         } 
         "`n"
-        $Userinput = Read-Host "ENTER (B) TO GO BACK"
+        $Userinput = Read-Host "(B) For Back: (A) Action Buttons"
         
         #Navigation Button
         if($userInput -eq "B"){
@@ -164,25 +160,39 @@ Function ChildFolder {
                         Pop-Location
                         }
 
-            }
+        }
+#____________________________Action Function_____________________________
+
+        ElseIf($Userinput -eq "A"){
+                $GetUserSelectedFile = [System.Collections.ArrayList] @()
+                $GetDirContent = Get-ChildItem .\
+                ForEach($File in $GetDirContent){
+                    $arrayVal = $GetUserSelectedFile.Add($file)
+               }
+                $ActionUserInput = Read-Host "Select Number of File or Directory Above."
+                $userSelection = $GetUserSelectedFile.IndexOf($ActionUserInput)
+                Write-Host $userSelection
+                write-host $userSelection.GetType()
+                Action-buttons -inputObject $userSelection
+        }
+#____________        
         Elseif(($Contents[$userInput]) -is [System.IO.DirectoryInfo]) {
             #Checking if a Directory is empty or not
-            if((Get-ChildItem) -eq $Null){
-                    Write-Host "Sorry, This Directory is empty"
-                    Pop-Location
-                    Write-Host "Redirecting..."
-                    Start-Sleep -Seconds 5
-                    #What should be done if a folder is empty
-        }Else{
-            Clear-Host
-            $userPath = $Contents[$userInput]
-            Push-Location $userPath
-            $Message = Get-Location
-            Clear-Host
-            Write-Host "You Are Currently Working $Message Directory"                
-            }
-        }
-        Elseif(($Contents[$userInput]) -is [System.IO.FileInfo]){
+                if((Get-ChildItem) -eq $Null){
+                        Write-Host "Sorry, This Directory is empty"
+                        Pop-Location
+                        Write-Host "Redirecting..."
+                        Start-Sleep -Seconds 5
+                        #What should be done if a folder is empty
+        }      Else{
+                        Clear-Host
+                        $userPath = $Contents[$userInput]
+                        Push-Location $userPath
+                        $Message = Get-Location
+                        Clear-Host
+                        Write-Host "You Are Currently Working $Message Directory"                
+                     }
+        }Elseif(($Contents[$userInput]) -is [System.IO.FileInfo]){
                 $filePath = [System.Collections.ArrayList] @()
                 $GetDirContent = Get-ChildItem .\
                 ForEach($File in $GetDirContent){
@@ -192,7 +202,7 @@ Function ChildFolder {
                 $filePath2 = $filePath[$userInput]
                 Write-Host "Processing $filePath2, Please Wait..." -ForegroundColor Green
                 Invoke-Item -Path .\$filePath2
-        } Else {
+        }Else {
                 Write-Warning "You Enter The Wrong Key: Enter (B) for Back, Or Enter The Number That Correspond to the Folder/File"
         }
            
@@ -361,7 +371,7 @@ Function User-WorkSpace {
             Action-buttons -inputObject $userInput
         }Else{
 #______________________________________________________________________________________
-                #Performing Action on User Selected File
+        #Performing Action on User Selected File
         if($UserOption -eq "A"){
             "User Option is A. Now let us process our action folder"
             #Action-buttons -inputObject $UserOption
