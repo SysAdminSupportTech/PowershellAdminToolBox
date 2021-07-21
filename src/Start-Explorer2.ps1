@@ -351,7 +351,7 @@ Function User-WorkSpace {
     param()
     Begin {
         Clear-Host
-        $UserPath = Split-Path $env:HomePath -Leaf #Split user path to get the username
+        $UserPath = Split-Path $env:HOMESHARE -Leaf #Split user path to get the username
         $HomePathSet = "C:\users\$UserPath" #Set the directory to loop contents on
         Set-Location $HomePathSet #set Path to user home path
     }

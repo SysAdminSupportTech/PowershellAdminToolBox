@@ -60,3 +60,4 @@ End{
    Remove-Item -Path "C:\temp\windowsDefenderUpdate.txt"
 }
 } #Type the path to the excel file here
+Update-UCWindowsDefender
