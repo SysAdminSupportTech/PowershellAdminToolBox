@@ -1,0 +1,18 @@
+Run-Playlist Created by Baba Oyedele Olusegun can perform the following actions
+1. Play-Special Program
+2. Play from a regular folder
+3. Select folder content base on time
+4. Determine Folder to play based on config file
+5. Create Folders based on the same config file
+6. Write log file when a folder is empty
+7. write user name who edit the config .log file
+
+What new Start-Radio Script will do
+1. Follow powersshell conventional naming style
+2. Write all activities in a log file
+3. Know which of the song was played last
+4. resume from the last song
+5. Monitory Butt application when not working as expected
+6. Keep record of all logs errors
+7. Monitor network flunctuation
+8. Include all the other features of the old  Run-Playlist script
