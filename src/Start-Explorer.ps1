@@ -174,9 +174,7 @@ Function ChildFolder {
                 $arrayVal = $GetUserSelectedFile.Add($file)
             }
             $ActionUserInput = Read-Host "Select Number of File or Directory Above."
-            $UserSelectVal = $GetUserSelectedFile[$ActionUserInput] # Get User Value base on the index Number Selected
-            $obj = $GetUserSelectedFile.IndexOf($userSelectVal) # Convert the Value of the user input into an index number that will be passed to my Action Function
-            Action-buttons -inputObject $obj # Passing the index value of the user to the action function
+            Action-buttons -inputObject $ActionUserInput # Passing the index value of the user to the action function
         }     
         Elseif (($Contents[$userInput]) -is [System.IO.DirectoryInfo]) {
             #Checking if a Directory is empty or not
