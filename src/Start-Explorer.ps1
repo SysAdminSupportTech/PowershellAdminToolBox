@@ -101,7 +101,24 @@ Function Action-buttons {
             } #----- End of script for user path existed.
         } #-------------------------------- end of Copy function loop
 
-        1 { write-host "YOu want to Cut" }
+        1 { 
+            $MovePath = Read-Host "ENTER FILEPATH"
+            #Copy Selected item to path specified by the user
+            if (Test-Path $MovePath) {
+                #Checking for file type
+                if(($UserSelectedObj) -is [System.IO.DirectoryInfo]){
+                    $FilePath = $UserSelectedObj.fullName
+                    Move-Item -Path ".\$UserSelectedObj\" -Destination $MovePath -Force -PassThru
+                    
+                }Else{
+                    Move-Item -Path .\$UserSelectedObj -Destination $MovePath
+                    Write-host "Item Moved Succesfully" -ForegroundColor Green
+                }
+            }
+            Else {
+                Write-Warning "The Path ($MovePath) You Specified Does not Exits. Please Check an try again"
+            }    
+          } #------------------------- End of Move-item
         2 { write-host "YOu want to Rename" }
         3 { write-host "YOu want to Propertise" }
         4 { write-host "YOu want to New Folder" }
