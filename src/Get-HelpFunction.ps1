@@ -15,7 +15,6 @@ Switched parameter activate the attached file feature in the script.
 function Send-UCMailMessage{
     [cmdletBinding ()]
     param(
-        $PSEmailServer = 'nlmail044.bethel.jw.org',
         $Attachment,
         [String]$Body,
         [Parameter(ValueFromPipeline = $true)]
@@ -36,7 +35,7 @@ function Send-UCMailMessage{
         To = $To
         Subject = $Subject
         Body = $Body
-        SmtpServer = $PSEmailServer
+        SmtpServer = 'nlmail044.bethel.jw.org'
         DeliveryNotificationOption = 'OnSuccess, OnFailure'
     }
 
