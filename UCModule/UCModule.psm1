@@ -81,7 +81,7 @@ Foreach($comps in $impComps.name) {
 
 
 #-----------------------------------------------------------GET ADCOMPUTER DATA---------------------------------------------------------------------------------------------#
-function Get-UCAdCompData {
+function Get-UCStewardPassword {
     [CmdletBinding()]
     param (
         [Parameter (Mandatory=$true,
