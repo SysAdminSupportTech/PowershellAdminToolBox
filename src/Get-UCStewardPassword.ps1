@@ -1,4 +1,4 @@
-﻿function Get-UCAdCompData {
+﻿function Get-UCStewardPassword {
     [CmdletBinding()]
     param (
         [Parameter (Mandatory=$true,
