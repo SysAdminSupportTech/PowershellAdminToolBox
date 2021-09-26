@@ -63,7 +63,7 @@ function Get-ConfigurationFile{
         #create it if folder does not exist
             if(-not (Test-Path ($strPlayListParentDir + ("\Playlist\" + $strThisFolder)))) {
                 New-Item -Path ($strPlayListParentDir + ("\Playlist\" + $strThisFolder)) -ItemType "directory"
-            cls
+            Clear-Host
             }
         }
        #make sure that myConfig.txt is read only so it is not accidentally edited
@@ -297,8 +297,9 @@ function Log-ErrorNoRestart() {
     Add-Content -Path $strLog -Value $strError
     Add-Content -Path $strLog $dtDate
 }
-cls
-$strConfigGlobal = Get-Location
+Clear-Host
+push-location 'G:\My Drive\KHCONF\ENGLISH\'
+$strConfigGlobal = Get-Location #Change this directory from Get-Location to Get-location
 $strConfigGlobal = ($strConfigGlobal.ToString() +"\Playlist\myconfig.txt")
 Get-ConfigurationFile
 write-host
