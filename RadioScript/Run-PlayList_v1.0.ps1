@@ -38,20 +38,15 @@ function Start-Program{
                 Play-Sound $strPlaylistFolder
            } '2' {
                 Play-SpecialProgram $strPlaylistFolder
-           } '3'{
-                Play-ForDaysOfWeek $strPlaylistFolder
-           }
-             '4' {
+           } '4' {
                 Prepare-Folders
-           }
-             '5' {
+           } '5' {
                 Edit-ConfigFile $strPlayListFolder
            }
       }    
 }
 
 function Get-ConfigurationFile{
-   
     $myConfig = get-content -path $strConfigGlobal
     $strPlayListParentDir = ""
     $myConfig | ForEach-Object {
@@ -75,7 +70,6 @@ function Get-ConfigurationFile{
        Set-ItemProperty -Path ($strPlayListParentDir + '\Playlist\myConfig.txt') -Name IsReadOnly -Value $true
     return $strPlayListParentDir
 }
-
 function Refresh-Configuration{
     $myConfig = get-content -path $strConfigGlobal
     $arAllFoldersAndTimes = @()
@@ -185,37 +179,7 @@ function Play-SpecialProgram{
     Play-CurrentFile $temp 0 1
 }
 
-function Play-ForDaysOfWeek{
-  param(
-        [string] $FullPathToSoundFiles='c:\users\user\projects\music' #--this part is the default. Can be overwritten by the parameter passed from the calling function
-    )
-    while (-not (Test-Path $FullPathToSoundFiles)) {
-        $FullPathToSoundFiles = Read-Host -Prompt "Please enter parent folder for PlayList directory"
-    
-    }
-     $intEnd=0
-     $FullPathToSoundFiles=$FullPathToSoundFiles +'\PlayList\DayOfWeek'
-     Write-Host "Waiting for next due time . . . "
-     do{
-        $cDate = get-date
-        $strDayOfWeek = $cDate.DayOfWeek
-        $cTime = Get-Date -UFormat "%R"
-        $strTime = ($cTime.ToString()).Replace(":","")
-        $strDirectory = ($FullPathToSoundFiles + "\" + $strDayOfWeek + "\" + $strTime)
-        if(Test-Path -LiteralPath $strDirectory){
-            if((Get-NumberOfSoundFiles $strDirectory) -gt 0){
-                Play-CurrentFile $strDirectory  0 0
-                Start-Sleep 120
-            }else{
-                cls
-                Log-ErrorNoRestart ('ALERT:  No media file to play at ' + $strDirectory)
-                Write-Host 'Waiting for next due time  . . . '
-                Start-Sleep 60
-            }
-        }
-        
-    } while($intEnd -eq 0)
-}
+#play days of week here.
 
 function Prepare-Folders{  
     try{
