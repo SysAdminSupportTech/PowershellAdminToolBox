@@ -21,3 +21,7 @@ EAPlayer
 1. Get all music from a specific time based on the time Select
 2. If player default to the regular directory, set music to shuffle mode
 3. Once the player switch to another folder based on the set time, music pause on the regular directory and play the one on the folder seleted.
+
+Start-TimeWatcher:
+Continuoes checking of time in the script to determine which folder is to be played.
+
