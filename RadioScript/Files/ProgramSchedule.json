@@ -1,15 +1,14 @@
 {
-    "5:00:00 AM":"BibleReading",
-    "7:00:00 AM":"Weekend",
-    "9:00:00 AM":"JWB",
-    "10:00:00 AM":"Drama_Movie",
-    "02:00:00 PM":"Convention_Assembly",
-    "4:00:00 PM":"PT_WT",
-    "6:00:00 PM":"MidWeek",
-    "8:00:00 PM":"Music_Children",
-    "9:00:00 PM":"BibleReading_JWB",
-    "11:00:00 PM":"Drama_Movie_2",
+    "5:00:00":"BibleReading",
+    "7:00:00":"Weekend",
+    "9:00:00":"JWB",
+    "10:00:00":"Drama_Movie",
+    "02:00:00":"Convention_Assembly",
+    "4:00:00":"PT_WT",
+    "6:00:00":"MidWeek",
+    "16:53:00":"Music_Children",
+    "13:08:00":"BibleReading_JWB",
+    "11:00:00":"Drama_Movie_2",
     "23:11:00":"you gat one",
-    "23:12:00":"you gat two",
-    "23:17:00":"you gat two"
+    "23:12:00":"you gat two"
 }
