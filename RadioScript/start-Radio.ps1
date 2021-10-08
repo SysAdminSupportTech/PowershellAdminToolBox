@@ -1,38 +1,45 @@
-<#
-    Play
-    Stop
-    Pause
-    Shuffle
-    NaturalDuration
-#>
 Function Start-EATimeWatcher{
-    #Add-Type -AssemblyName presentationcore
-    #$EAPlayer = New-Object System.Windows.Media.MediaPlayer #create an instance of my program
-    $ProgramSched = (Get-Content -Path C:\Users\DeptAdmin\Documents\codeEnv\PowershellAdminToolBox\RadioScript\Files\ProgramSchedule.json -Raw) |ConvertFrom-Json
-    $jsonVal = $ProgramSched.psobject.Properties.name
-    #Get System Time to play folder
-    
-    
-    #do loop
-    do{
-        $GetTime = Get-Date -Format HH:mm:ss
-        forEach($Time in $jsonVal){
-            if($time -eq $Gettime){
-                Write-Host "value Gotten..."
-                $TimeGet = $time
-                return $ProgramSched.$TimeGet
-            } else {
-                "$GetTime"
+    Try{
+        do{
+            $ProgramSched = (Get-Content -Path C:\Users\DeptAdmin\Documents\codeEnv\PowershellAdminToolBox\RadioScript\Files\ProgramSchedule.json -Raw) |ConvertFrom-Json
+            $jsonVal = $ProgramSched.psobject.Properties.name
+            $GetTime = Get-Date -Format HH:mm:ss
+            forEach($Time in $jsonVal){
+                if($time -eq $Gettime){
+                    $TimeGet = $time
+                    Push-Location -Path "C:\Users\DeptAdmin\My Drive\KHCONF\ENGLISH\PlayList\"
+                    Get-ChildItem -Name $ProgramSched.$TimeGet -Force -Recurse
+                    return $ProgramSched.$TimeGet
+                    Pop-Location
+                } else {
+                    "$GetTime"
+                }
             }
-        }
-    }while($true)
-    
+        }while($true)
+    }Catch{}
+    #Get System Time to play folder
+    #do loop
 }
-Start-EATimeWatcher
+
+    Function Start-EAPlayer{
+        param(
+            [string][Parameter(Mandatory = $true)]$musicPath
+        )
+        Add-Type -AssemblyName presentationcore
+        $EAPlayer = New-Object System.Windows.Media.MediaPlayer #create an instance of my program
+        $Musicfiles = Get-ChildItem -Path "C:\Users\DeptAdmin\My Drive\KHCONF\ENGLISH\PlayList"
+        $musics = Get-ChildItem -Path "C:\Users\DeptAdmin\My Drive\KHCONF\ENGLISH\PlayList\Music_Children"
+        ForEach($music in $musics){
+            "Playing Music $($music.BaseName)"
+            $EAPlayer.open([uri]"$($music.FullName)")
+            $EAPlayer.Play()
+            Start-Sleep -Seconds 3
+            $EAPlayer.Stop()
+        }
+        
+    }
+
+#Start-EATimeWatcher
+Start-EAPlayer -musicPath "C:\Users\DeptAdmin\My Drive\KHCONF\ENGLISH\PlayList"
 
 
-
-#Get content of Folder based on set time
-#$settime = Get-Date -Format HH:mm:ss #this retrive only time for get-date
-
-#$userVal = "11:00:00 PM"
