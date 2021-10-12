@@ -4,21 +4,17 @@
 Function Start-Configuration{
     [cmdletBinding()]
     param()
-    #Setting Default Path to run script Configuration
-    $myPath = $MyInvocation.MyCommand.Path
-    
     #setting user directory path for runing the music files
     $usrhome = $env:HOMEPATH #Get user home dir
-    Write-Host "Do you want to set music directory path (Y/N) :" -ForegroundColor Yellow -NoNewline 
-    $usrChoice = Read-Host
+    $usrChoice = Read-Host "Do you want to set music directory path (Y/N)"
     switch($usrChoice){
         'Y'{
             $UsrMusicPath = Read-Host "Enter Music Path"
             if(Test-Path -Path $UsrMusicPath){
-                Push-Location $UsrMusicPath
-                $UsrMusicPath | Out-File "$usrhome\Documents\codeEnv\PowershellAdminToolBox\RadioScript\Files\MusicPath.txt"
-                $GetUsrMusicPath = Get-Location
-                Write-Host "Your Default Music Path is $GetUsrMusicPath" -ForegroundColor Green
+                New-Item -Path $UsrMusicPath\EAFilePath.txt -Force -ItemType File
+                $usrMusicPath | Out-File $UsrMusicPath\EAFilePath.txt
+                $SetMusicPath = Get-Content -Path $UsrMusicPath\EAFilePath.txt
+                Push-location $SetMusicPath
             }Else{
                 Write-Host "An Error Just occured. Music Path Does Not Exist" -ForegroundColor Red
             }
@@ -35,8 +31,7 @@ Function Start-Configuration{
             }
         }
     }
-    Write-Host "this is the script Pathe $myPath"
-    Read-Host
+  <#
     $Languages = (Import-Csv -Path "G:\My Drive\KHCONF\Settings\Languages.csv").Language_Names #Creating the language directory based on the user selection
     $LanguageCollections = [System.Collections.ArrayList]@()
     Write-Output "SELECT NUMBER TO THE LANGUAGE YOU WANT TO SET UP"
@@ -69,7 +64,6 @@ Function Start-Configuration{
             }
         }
 
-    }
+    }#>
 }
 Start-Configuration
-Pop-Location
