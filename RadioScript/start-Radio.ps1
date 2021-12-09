@@ -36,10 +36,10 @@ Function Start-EATimeWatcher{
             Start-Sleep -Seconds 3
             $EAPlayer.Stop()
         }
-        
+        Write-Host $EAPlayer.Volume
     }
 
 #Start-EATimeWatcher
-Start-EAPlayer -musicPath "C:\Users\DeptAdmin\My Drive\KHCONF\ENGLISH\PlayList"
+#Start-EAPlayer -musicPath "C:\Users\DeptAdmin\My Drive\KHCONF\ENGLISH\PlayList"
 
 

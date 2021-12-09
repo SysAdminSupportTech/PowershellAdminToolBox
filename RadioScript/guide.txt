@@ -23,3 +23,7 @@ When Creating a default Folder
 2. Ask the user if he has another folder in mind by default
 3. If yes --> Work with user selected path and keep a record on a file to always set the user powershell scope to that path
 4. If No --> then use the default mode of the user directory.
+
+
+reference
+https://docs.microsoft.com/en-us/dotnet/api/system.windows.media.mediaplayer?view=windowsdesktop-6.0
