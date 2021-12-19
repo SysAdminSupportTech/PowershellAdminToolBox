@@ -49,7 +49,7 @@ Function New-UCLocalUser{
         y{  
             Clear-Host
             Net user $UserName /logonPasswordChg:yes
-            Write-Host "Account Created Successfully" -ForegroundColor Green
+            Write-Host "Account Created Successfully." -ForegroundColor Green
             Write-Host "Account Name: $UserName"
             Write-Host "Group Member: $LocalAccountGroup"
             Write-Host "User Will be required to change password at next logon"
