@@ -1,0 +1,16 @@
+ScriptName: Start-Crawler
+Purpose: This script is design to check users computer that has used of thier C:\, and delete any unwanted documents or files found on the user computer
+Author: Albert,Eromosele
+Authorization: CD Oversight
+
+Steps to implement:
+1. use invoke command to enter the user computer
+2. Search out all files on user computers depending on the file size specified by the oversight: By default, it should be 2MB and above.
+3. List all file in a specific directory and send a mail to the user that the files will be deleted
+4. or Delete files based on oversight approval
+
+Structur:
+Create three function.
+1. Get all the files.
+2. Perform action on file generate
+3. [OPTIONAL] Send a mail to user informing him when the files will be deleted. 
