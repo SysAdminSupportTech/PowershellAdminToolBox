@@ -14,3 +14,6 @@ Create three function.
 1. Get all the files.
 2. Perform action on file generate
 3. [OPTIONAL] Send a mail to user informing him when the files will be deleted. 
+
+Additional Note:
+- computers might be enter as individual or through csv
