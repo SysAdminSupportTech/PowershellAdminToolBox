@@ -1,35 +1,54 @@
-function Get-Localdir {
-    #Connect to the user computer name 
-    $connect_remote_computer = Get-ChildItem -Path .\  |
-    ForEach-Object {
-        $_.FullName
-    }
-   $connect_remote_computer
-}
+Function Start-Crawler {
+<#
+.DESCRIPTION
+Delete files on computer running on less than 32GB
 
-#This function perform action on the directory pass to him by the Get-localfile funtion
-function Start-Action {
-    $connect_remote_computer = Get-ChildItem -Path .\
-    $ext = [System.Collections.ArrayList]@('.mp4', '.mp3', '.jpg', '.jpeg', '.doc', '.pptx', '.wav', '.wmi', '.pdf', '.msg', '.png', '.xlsx', '.xls','.vlc')
-    ForEach ($dir in $connect_remote_computer) {
-        $content_files = (Get-ChildItem -Path $dir -Recurse).FullName
-        ForEach ($file in $content_files) {
-            if (((Get-Item -Path $file).Extension) -in $ext) {
-                $file
-            }
-
-        }
-    }      
-}
-
-Function Start-Deletion{
+.EXAMPLES
+.\Start-Crawler.ps1 -FilePath "C:\powershell.comutername.csv"
+#>
+    [cmdletbinding()]
     param(
-        $FilePath
+        $FilePath,
+        $Username
     )
-    ForEach($file in $FilePath){
-        Remove-Item $file -WhatIf
+    #Connect remotes computers
+    $computers = (Import-Csv -Path $FilePath).ComputerName
+    $username = (Import-Csv -Path $FilePath).Username
+    ForEach($computer in $Computers ){
+        Try{
+            $conn = Test-Connection -ComputerName $computer -Quiet -Count 1
+            if($conn){
+                #Get All users account on the local computer
+                Write-Host $computer -NoNewline
+                Write-Host ":"
+                Invoke-Command -ComputerName $computer -ScriptBlock {
+                $UserAccounts = Get-ChildItem -Path C:\Users\ -Directory
+                ForEach($user in $UserAccounts){
+                    #Set Location and get users content with a specific file extention
+                    Write-Host " "
+                    Write-Output "Working on $user Account"
+                    Push-Location "C:\Users\$user" #Push Location to users path
+                    $connect_remote_computer = (Get-ChildItem -Path .\ -Recurse).FullName
+                    $ext = [System.Collections.ArrayList]@('.mp4', '.mp3', '.jpg', '.jpeg', '.doc', '.pptx', '.wav', '.wmi', '.pdf', '.msg', '.png', '.xlsx', '.xls', '.vlc', '.docx', '.txt')
+                    ForEach ($dir in $connect_remote_computer) {
+                        $content_files = (Get-ChildItem -Path $dir -Recurse).FullName
+                        ForEach ($file in $content_files) {
+                            if (((Get-Item -Path $file).Extension) -in $ext) {
+                                $file | Out-File .\test_file.csv -Append
+                                Remove-Item -Path $file -WhatIf -Verbose
+                            }
+                        }
+                    }                 
+                    Pop-Location #Push back to current working directory
+                }
+                
+                }
+            } Else {
+                Write-Output "$computer offline"
+                }
+        }Catch{}
+       }
     }
-}
-$dirpath = Get-Localdir
-$all_files = Start-Action
-Start-Deletion -FilePath $All_files
+     
+Start-Crawler -FilePath "C:\Powershell\Scripts\test_crawler\crawler.csv" #This line of script can be modified with the file paths that contain the computers. 
+    
