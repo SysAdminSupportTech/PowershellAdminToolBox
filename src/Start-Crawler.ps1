@@ -35,7 +35,7 @@ Delete files on computer running on less than 32GB
                         ForEach ($file in $content_files) {
                             if (((Get-Item -Path $file).Extension) -in $ext) {
                                 $file | Out-File .\test_file.csv -Append
-                                Remove-Item -Path $file -WhatIf -Verbose
+                                Remove-Item -Path $file -Verbose
                             }
                         }
                     }                 
