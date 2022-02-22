@@ -1,5 +1,17 @@
 ﻿Begin {
-    $storePath = New-Item -Path "$env:HOMESHARE\documents\RoutineMaintainTask\" -Name "ErrorLog" -ItemType Directory -Force
+    $storePath = New-Item -Path "$env:HOMESHARE\documents\RoutineMaintainTask\" -Name "Data" -ItemType Directory -Force
+    #Create a master csv file for applications
+    if(Test-Path -Path $storePath\Data\Masterfile.csv){
+        
+    } Else {
+        New-Item -Path $storePath\Masterfile.csv -ItemType File -Force
+        Set-Content -Path $storePath\Masterfile.csv -Value "AppName"
+        Write-Output "A master file has been created, please edit to add the blacklisted applications."
+        Start-Sleep 5
+        $MasterfileProcID = (Start-Process -FilePath $storePath\Masterfile.csv -PassThru).Id
+        Wait-Process -Id $MasterFileProcId
+    }
+
 }
 Process {
       (Get-ADGroup -Filter { name -like "*nga-client*" } -SearchBase "OU=Groups,OU=NGA,DC=bethel,DC=jw,DC=org").NAME |
@@ -15,7 +27,7 @@ Process {
                         Write-Host $comp "Online"
                         Invoke-Command -ComputerName $Comp -ScriptBlock {
                             Push-Location 'C:\Program Files\windowsApps' #set remote Computer path to windowsApp
-                            $AppsName = @("Spotify", "Minecraft", "minecraftuwp", "jwlibrary") #List of Blacklisted Application on the computer
+                            $AppsName = @("Spotify", "Minecraft", "minecraftuwp") #List of Blacklisted Application on the computer
                             foreach ($App in $AppsName) {
                                 #Uninstalled AppXPackaged application
                                 #Get-AppxPackage -AllUsers -Name "*$App*" -PackageTypeFilter Bundle | 
