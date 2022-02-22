@@ -1,0 +1,5 @@
+#Modification of Uninstallation of blacklisted applications
+1. Remove the script from function ✔
+2. Create a csv file with column for applications names and path to save logs and other informations
+3. Create a log file.txt file when the script is instantiated. 
+4. Clean up script ✔
