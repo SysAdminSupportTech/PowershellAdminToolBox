@@ -39,14 +39,13 @@ Process {
                             foreach ($App in $AppsName) {
                                 Write-Host "Checking AppxPackage: $App " -NoNewline
                                 #Uninstalled AppXPackaged application
-                                $AppX = Get-AppxPackage -AllUsers -Name "*$App*"
+                                $AppX = (Get-AppxPackage -AllUsers -Name "*$App*" -PackageTypeFilter Bundle).PackagefullName
                                 if($AppX){
                                     Write-Host "$AppX"
                                     Foreach($AppXPackage in $AppX){
                                     "`n"
-                                        Write-Host "Removing: $AppXPackage"
-                                       (Get-AppxPackage -AllUsers -Name $AppXPackage -PackageTypeFilter Bundle).PackageFullName |
-                                       Remove-AppxPackage -Confirm:$false -WhatIf
+                                       Write-Host "Removing: $AppXPackage"
+                                       $AppX | Remove-AppxPackage -Confirm:$false
                                     }
                                 } Else {
                                     Write-Host "Not Found AppXPackage"
@@ -59,7 +58,7 @@ Process {
                                     Write-Host "$AppsPath"
                                     "`n"
                                     ForEach($Path in $AppsPath){
-                                        Remove-Item -Path $Path -Force -Confirm:$false -Recurse -whatif -verbose
+                                        Remove-Item -Path $Path -Force -Confirm:$false -Recurse -verbose
                                     }
                                     "`n"
                                 } Else{
