@@ -1,5 +1,19 @@
 ﻿Begin {
-    $storePath = New-Item -Path "$env:HOMESHARE\documents\RoutineMaintainTask\" -Name "ErrorLog" -ItemType Directory -Force
+    $localHost = (Get-Item -Path Env:\COMPUTERNAME).value
+    [string]$storePath = New-Item -Path "$env:HOMESHARE\documents\RoutineMaintainTask\Data\" -ItemType Directory -Force
+    $UNC = $storePath.replace(":","$")
+    #Create a master csv file for applications
+    if(Test-Path -Path $storePath\Masterfile.csv){
+        Write-Output "Processesing Script Started..."
+    } Else {
+        New-Item -Path $storePath\Masterfile.csv -ItemType File -Force
+        Set-Content -Path $storePath\Masterfile.csv -Value "AppName"
+        Write-Output "A master file has been created, please edit to add the blacklisted applications."
+        Start-Sleep 5
+        $MasterfileProcID = (Start-Process -FilePath $storePath\Masterfile.csv -PassThru).Id
+        Wait-Process -Id $MasterFileProcId
+    }
+
 }
 Process {
       (Get-ADGroup -Filter { name -like "*nga-client*" } -SearchBase "OU=Groups,OU=NGA,DC=bethel,DC=jw,DC=org").NAME |
@@ -13,27 +27,43 @@ Process {
                     #*****************Try/Catch error*******************
                     try {
                         Write-Host $comp "Online"
+                        $tempdir = (New-Item -Path \\$Comp\C$\UCTemp\ -ItemType Directory -Force).FullName #Create a temp file in the local computer using UNC
+
+                        if(-not(Test-Path -Path $tempdir\Masterfile.csv)){
+                            Copy-Item -Path \\$localHost\$UNC\Masterfile.csv -Destination $tempdir -force #copy item to the remote computer UCTempdir
+                        }
                         Invoke-Command -ComputerName $Comp -ScriptBlock {
                             Push-Location 'C:\Program Files\windowsApps' #set remote Computer path to windowsApp
-                            $AppsName = @("Spotify", "Minecraft", "minecraftuwp", "jwlibrary") #List of Blacklisted Application on the computer
+                            #$AppsName = @("Spotify", "Minecraft", "minecraftuwp") #List of Blacklisted Application on the computer(line Modified)
+                            $AppsName = (Import-Csv -Path c:\uctemp\Masterfile.csv).AppName
                             foreach ($App in $AppsName) {
+                                Write-Host "Checking AppxPackage: $App " -NoNewline
                                 #Uninstalled AppXPackaged application
-                                #Get-AppxPackage -AllUsers -Name "*$App*" -PackageTypeFilter Bundle | 
-                                #Select-Object -ExpandProperty PackageFullName | Remove-AppxPackage -Confirm:$false
+                                $AppX = (Get-AppxPackage -AllUsers -Name "*$App*" -PackageTypeFilter Bundle).PackagefullName
+                                if($AppX){
+                                    Write-Host "$AppX"
+                                    Foreach($AppXPackage in $AppX){
+                                    "`n"
+                                       Write-Host "Removing: $AppXPackage"
+                                       $AppX | Remove-AppxPackage -Confirm:$false
+                                    }
+                                } Else {
+                                    Write-Host "Not Found AppXPackage"
+                                }
                         
                                 #Check for Application Path on Windows Folder and Delete
+                                Write-Host "Checking App: $App " -NoNewline
                                 $AppsPath = Get-ChildItem -Name "*$app*"
-                                forEach ($Path in $AppsPath) { 
-                                    #Remove-Item -Path $Path -Force -Confirm:$false -Recurse
-                                    #Checking if the file path is deleted or not
-                                    if (Test-Path $Path) {
-                                        Write-Output "Unable to delete the specified Path $path"
+                                if($AppsPath){
+                                    Write-Host "$AppsPath"
+                                    "`n"
+                                    ForEach($Path in $AppsPath){
+                                        Remove-Item -Path $Path -Force -Confirm:$false -Recurse -verbose
                                     }
-                                    Else {
-                                        Write-Output "Path has Been Deleted Successfully."
-                                        $Comp | Out-File $CSVExport\ComputerHandled.csv -Append
-                                    }
-                                }#End of inner foreach
+                                    "`n"
+                                } Else{
+                                    write-host "Not Found"
+                                }
                             }#End of First Foreach
                         }-ErrorAction SilentlyContinue
                     }
