@@ -3,3 +3,13 @@
 2. Create a csv file with column for applications names and path to save logs and other informations
 3. Create a log file.txt file when the script is instantiated. 
 4. Clean up script ✔
+
+
+Note:
+Applications name not working because the file im working on is on my local computer, while im in the remote machine, i automatically loss access to the data on my local computer... This will be worked on tomorrow
+
+Note: Since Kerberous authenticaion is symmetric enryption, it means it will not be possible to remotely connect to a computer and from that computer, get content from the host computer. 
+
+
+Continue:
+Working on the removal of App Package
